@@ -1,0 +1,122 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>demo5</title>
+    <script src="bower_components/jquery/dist/jquery.min.js"></script>
+    <script src="bower_components/velocity/velocity.min.js"></script>
+    <script src="bower_components/velocity/velocity.ui.min.js"></script>
+    <style>
+        body{
+            position: relative;
+        }
+        img{
+            position: absolute;
+        }
+        #content{
+            position: relative;
+        }
+
+    </style>
+
+</head>
+
+<body class="impress-not-supported">
+<div id="content">
+    <button id="btnstart">スタート</button>
+    <button id="btnreset">リセット</button>
+    <ul>
+      <li>フレームごとに、桜のimgタグを生成する</li>
+      <li>全ての桜についてcssプロパティ（位置、回転、サイズ、透過度）などを更新する。</li>
+    </ul>
+</div>
+<script>
+(function(){
+    $(function(){
+        var rand = function(min, max) {
+            return Math.floor((Math.random() * (max - min + 1)) + min);
+        };
+
+        var img =[];
+        img.push( $('<img src="./img/sakura1.png" class="sakuraimg">') );
+        img.push( $('<img src="./img/sakura2.png" class="sakuraimg">') );
+
+        //桜オブジェクト
+        function SAKURA(){
+            this.cntX = rand(0, 100);
+            this.cntY = rand(0, 100);
+            this.$ele = img[rand(0,1)].clone();
+            this.init = {
+                scale: rand(0.5,2),
+                x : rand(0, $('body').width()),
+                y : 0,
+                opacity:1.0,
+                rotation: rand(0,360)
+            };
+            this.put();
+        }
+        //桜更新
+        SAKURA.prototype.update = function(idx){
+            this.cntX++;
+            this.cntY++;
+            disX = Math.sin(this.cntX/10)*5;
+            disY = Math.sin(this.cntY/5)*2;
+            this.$ele.css({
+                opacity: this.$ele.css('opacity')-0.005,
+                top: parseInt(this.$ele.css('top'),10) + disY + 3,
+                left: parseInt(this.$ele.css('left'),10) + disX,
+                transform: 'scale(' + this.init.scale + ',' + this.init.scale + ') rotate('+(this.cntX%180)/3+'deg)'
+            });
+//            if(parseInt(this.$ele.css('top'),10) > $(window).height()){
+//                this.remove(idx);
+//            }
+            if(this.$ele.css('opacity')==0){
+              this.remove(idx);
+            }
+
+            return true;
+        };
+        // 桜表示
+        SAKURA.prototype.put = function(){
+            $('body').append(this.$ele);
+            this.$ele.css({
+                left: this.init.x,
+                top: this.init.y,
+                transform: 'scale(' + this.init.scale + ',' + this.init.scale + ')'
+            })
+        };
+        // 桜削除
+        SAKURA.prototype.remove = function(idx){
+            this.$ele.remove();
+            delete sakuras[idx];
+        };
+
+        // 桜コンテナ
+        var sakuras = [];
+        var cnt = 0;
+
+      function update(){
+        cnt++;
+        if(cnt%2==1){
+            // 桜生成
+            sakuras.push(new SAKURA());
+        }
+        sakuras.forEach(function(element,idx){
+            element.update(idx);
+        });
+        frameanime = requestAnimationFrame(update);
+      }
+
+      $("#btnstart").click(function(){
+        frameanime = requestAnimationFrame(update);
+      });
+      $("#btnreset").click(function(){
+        cancelAnimationFrame(frameanime);
+      });
+
+
+    });
+})(jQuery);
+</script>
+</body>
+</html>

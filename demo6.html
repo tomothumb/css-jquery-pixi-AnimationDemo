@@ -1,0 +1,159 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>demo5</title>
+  <script src="bower_components/jquery/dist/jquery.min.js"></script>
+  <script src="bower_components/pixi.js/bin/pixi.min.js"></script>
+  <script src="js/PixiParticles-master/dist/pixi-particles.min.js"></script>
+
+    <style>
+        body{
+            position: relative;
+        }
+        img{
+            position: absolute;
+        }
+        #content{
+            position: relative;
+        }
+      #bganime{
+        position: absolute;
+        z-index: 0;
+      }
+        #bganime canvas{
+          background: #FFFFFF;
+        }
+
+    </style>
+
+</head>
+
+<body class="impress-not-supported">
+<div id="bganime"></div>
+<div id="content">
+    <button id="btnstart">スタート</button>
+    <button id="btnreset">リセット</button>
+    <p>PixiParticles まかせ。<br>
+      オンラインジェネレータ（<a target="_blank" href="http://cloudkidstudio.github.io/PixiParticlesEditor/">http://cloudkidstudio.github.io/PixiParticlesEditor/</a>）</p>
+</div>
+<script>
+(function(){
+    $(function(){
+
+
+      var images =[
+        './img/sakura1.png',
+        "./img/sakura2.png",
+      ];
+
+      var SAKURA1 = {
+        "alpha": {
+          "start": 0.57,
+          "end": 0.74
+        },
+        "scale": {
+          "start": 0.5,
+          "end": 2,
+          "minimumScaleMultiplier": 0.5
+        },
+        "color": {
+          "start": "#f7d8b4",
+          "end": "#e36f6f"
+        },
+        "speed": {
+          "start": 200,
+          "end": 200
+        },
+        "acceleration": {
+          "x": -1,
+          "y": 1
+        },
+        "startRotation": {
+          "min": 45,
+          "max": 100
+        },
+        "rotationSpeed": {
+          "min": 0,
+          "max": 10
+        },
+        "lifetime": {
+          "min": 4,
+          "max": 4
+        },
+        "blendMode": "normal",
+        "ease": [
+          {
+            "s": 0,
+            "cp": 0.379,
+            "e": 0.548
+          },
+          {
+            "s": 0.548,
+            "cp": 0.717,
+            "e": 0.676
+          },
+          {
+            "s": 0.676,
+            "cp": 0.635,
+            "e": 1
+          }
+        ],
+        "frequency": 0.01,
+        "emitterLifetime": -1,
+        "maxParticles": 3000,
+        "pos": {
+          "x": 0,
+          "y": 0
+        },
+        "addAtBack": false,
+        "spawnType": "rect",
+        "spawnRect": {
+          "x": 0,
+          "y": 0,
+          "w": 1024,
+          "h": 0
+        }
+      };
+
+      // 背景メイン
+      var renderer = PIXI.autoDetectRenderer(1200, 800,{transparent : true});
+      document.getElementById("bganime").appendChild(renderer.view);
+      var stage = new PIXI.Container();
+
+
+      var loader = PIXI.loader;
+      for(var i = 0; i < images.length; ++i){
+        loader.add("load" + i, images[i]);
+      }
+      // Create a new emitter
+      var emitter = new cloudkid.Emitter(
+          stage,
+
+          [PIXI.Texture.fromImage('./img/sakura1.png'),
+            PIXI.Texture.fromImage('./img/sakura2.png')],
+          SAKURA1
+      );
+      var elapsed = Date.now();
+      var update = function(){
+        var now = Date.now();
+        emitter.update((now - elapsed) * 0.001);
+        elapsed = now;
+         renderer.render(stage);
+        frameanime = requestAnimationFrame(update);
+      };
+      emitter.emit = true;
+
+      $("#btnstart").click(function(){
+        update();
+      });
+      $("#btnreset").click(function(){
+        cancelAnimationFrame(frameanime);
+      });
+
+
+    });
+})(jQuery);
+</script>
+</body>
+</html>

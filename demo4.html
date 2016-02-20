@@ -1,0 +1,155 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>demo3</title>
+<script src="bower_components/jquery/dist/jquery.min.js"></script>
+<script src="bower_components/velocity/velocity.min.js"></script>
+<script src="bower_components/velocity/velocity.ui.min.js"></script>
+<style>
+    .block{
+        padding: 30px;
+    }
+    .btn{
+        padding: 10px 20px;
+    }
+    .box{
+        padding: 10px;
+        width: 20%;
+        height: 30px;
+        margin-bottom: 5px;
+        background-color: #CCCCCC;
+        color:#000000;
+    }
+    #anime1,
+    #anime2,
+    #anime3{
+    transition: all 1s ease;
+    }
+
+    #anime1.anime-start,
+    #anime2.anime-start,
+    #anime3.anime-start{
+        width: 100%;
+        color:#CC0000;
+        background-color:#CC9999;
+    }
+</style>
+</head>
+
+<body class="impress-not-supported">
+<button id="btnstart" class="btn">スタート</button>
+<button id="btnreset" class="btn">リセット</button>
+<div class="block">
+    <h3>CSS transition（Event:transitionend）でアニメーションをつなぐ（IE10+）</h3>
+<div id="anime1" class="box"><p>CSS transition： Scene1</p></div>
+<div id="anime2" class="box"><p>CSS transition： Scene2</p></div>
+<div id="anime3" class="box"><p>CSS transition： Scene3</p></div>
+</div>
+<hr>
+<div class="block">
+    <h3>$().animate()でアニメーションをつなぐ</h3>
+<div id="anime4" class="box"><p>$().animate()： Scene2</p></div>
+<div id="anime5" class="box"><p>$().animate()： Scene5</p></div>
+<div id="anime6" class="box"><p>$().animate()： Scene6</p></div>
+</div>
+<hr>
+<div class="block">
+    <h3>$().velocity()でアニメーションをつなぐ （<a href="http://julian.com/research/velocity/">http://julian.com/research/velocity/</a>）</h3>
+    <p>jQueryAnimateでは操作出来ないcolorも変更できる。</p>
+<div id="anime7" class="box"><p>$().velocity()： Scene7</p></div>
+<div id="anime8" class="box"><p>$().velocity()： Scene8</p></div>
+<div id="anime9" class="box"><p>$().velocity()： Scene9</p></div>
+    </div>
+<ul>
+    <li>CSSアニメーションの完了イベント（transitionend/MSTransitionEnd/webkitTransitionEnd/oTransitionEnd）は、<br>変更したCSSプロパティの個数の回数呼ばれる。<br>
+        「margin,padding,color」を変更した場合は、3回イベントが発火する。<br>
+        回避方法：<br>
+        $("#xxx").off('transitionend MSTransitionEnd webkitTransitionEnd oTransitionEnd')してあげる。</li>
+    <li>※CSS3を動的にはサワレナイ。<br>
+        触る場合は、stepプロパティ（$("#xxx").animate({....},{step:function(){...},dulation:1000})）を指定するか、<br>
+        CSSで、transitionを指定しておき、$("#xxx").css({....})とでアニメーションさせる。</li>
+</ul>
+
+
+<script>
+(function(){
+    $(function(){
+
+        var TRANSITIONEND = "transitionend MSTransitionEnd webkitTransitionEnd oTransitionEnd";
+
+        // Using Css Animation
+        var afterAnime1 = function(){
+            console.log('anime1-end');
+            $("#anime1").off(TRANSITIONEND);
+            $("#anime2").addClass("anime-start");
+        };
+        var afterAnime2 = function(){
+            console.log('anime2-end');
+            $("#anime2").off(TRANSITIONEND);
+            $("#anime3").addClass("anime-start");
+        };
+        var afterAnime3 = function(){
+            console.log('anime3-end');
+            $("#anime3").off(TRANSITIONEND);
+        };
+        var cssanimesetting = function(){
+            $("#anime1").on(TRANSITIONEND, afterAnime1);
+            $("#anime2").on(TRANSITIONEND, afterAnime2);
+            $("#anime3").on(TRANSITIONEND, afterAnime3);
+        };
+        cssanimesetting();
+
+
+//        jQueryとVelocityで変更してみるCSSプロパティ
+        var afterCssProperty = {
+            'width' : '100%',
+            'color' :'#CC0000',
+            'background-color':'#CC9999'
+        };
+
+        // Using jQuery Animation
+        var anime4 = function(){
+            $("#anime4").animate(afterCssProperty,1000,'swing',anime5);
+        };
+        var anime5 = function(){
+            $("#anime5").animate(afterCssProperty,1000,'swing',anime6);
+        };
+        var anime6 = function(){
+            $("#anime6").animate(afterCssProperty,1000,'swing');
+        };
+
+        // Using velocity
+        var anime7 = function(){
+            $("#anime7").velocity(afterCssProperty,1000,'swing',anime8);
+        };
+        var anime8 = function(){
+            $("#anime8").velocity(afterCssProperty,1000,'swing',anime9);
+        };
+        var anime9 = function(){
+            $("#anime9").velocity(afterCssProperty,1000,'swing');
+        };
+
+
+
+
+//        実行
+        $("#btnstart").click(function(){
+            cssanimesetting();
+            $("#anime1").addClass("anime-start");
+            anime4();
+            anime7();
+        });
+//        リセット
+        $("#btnreset").click(function(){
+            $('.box').removeClass('anime-start');
+            $('.box').attr('style','');
+        });
+
+
+
+    });
+})(jQuery);
+</script>
+</body>
+</html>
